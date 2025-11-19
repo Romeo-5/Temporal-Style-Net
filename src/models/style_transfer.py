@@ -88,9 +88,19 @@ class Decoder(nn.Module):
             nn.Conv2d(64, 64, 3),
             nn.ReLU(inplace=True),
             nn.ReflectionPad2d(1),
-            nn.Conv2d(64, 3, 3)
+            nn.Conv2d(64, 3, 3),
+            nn.Sigmoid()  
         )
-    
+        self._initialize_weights()
+        
+    def _initialize_weights(self):
+        """Initialize decoder weights"""
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+
     def forward(self, x):
         """Decode features to RGB image"""
         x = self.conv4(x)
@@ -161,33 +171,30 @@ class StyleTransferNet(nn.Module):
         return self.decoder(t)
     
     def forward(self, content, style, alpha=1.0):
-        """
-        Perform style transfer
-        
-        Args:
-            content: Content image [N, 3, H, W]
-            style: Style image [N, 3, H', W']
-            alpha: Style strength (0-1)
-        
-        Returns:
-            Stylized image [N, 3, H, W]
-        """
+        """Perform style transfer"""
         assert 0 <= alpha <= 1, "Alpha must be between 0 and 1"
-        
+    
         # Extract features
         content_feat = self.encode(content)
         style_feat = self.encode(style)
-        
+    
         # Apply AdaIN
         t = adaptive_instance_normalization(content_feat, style_feat)
-        
+    
         # Blend with original content features
         t = alpha * t + (1 - alpha) * content_feat
-        
+    
         # Decode
         output = self.decode(t)
-        
-        return output
+    
+        # FIX: Resize decoder output to match content dimensions
+        if output.shape != content.shape:
+            output = F.interpolate(output, size=content.shape[2:], mode='bilinear', align_corners=False)
+    
+        # Blend decoded output with original content
+        output = 0.3 * output + 0.7 * content
+    
+        return output.clamp(0, 1)
     
     def get_features(self, x):
         """Get multi-scale features for loss computation"""

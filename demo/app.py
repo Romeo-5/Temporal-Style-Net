@@ -24,7 +24,7 @@ class StyleTransferDemo:
             method='adain',
             device='cuda' if torch.cuda.is_available() else 'cpu',
             use_temporal_consistency=True,
-            lightweight=True  # Use lightweight model for demo
+            lightweight=False  # Use lightweight model for demo
         )
         print(f"Initialized on device: {self.processor.device}")
     
