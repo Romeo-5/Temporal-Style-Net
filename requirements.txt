@@ -1,0 +1,46 @@
+# Core dependencies
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+opencv-python>=4.8.0
+Pillow>=10.0.0
+
+# Video processing
+ffmpeg-python>=0.2.0
+imageio>=2.31.0
+imageio-ffmpeg>=0.4.9
+
+# Optical flow
+scipy>=1.11.0
+
+# Metrics and evaluation
+lpips>=0.1.4
+scikit-image>=0.21.0
+pytorch-fid>=0.3.0
+
+# Training utilities
+tensorboard>=2.14.0
+tqdm>=4.66.0
+pyyaml>=6.0
+
+# Multi-GPU support
+torch-distributed>=0.1.0
+
+# Demo and visualization
+gradio>=3.50.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Code quality
+black>=23.7.0
+flake8>=6.1.0
+isort>=5.12.0
+
+# Optional: Stable Diffusion (if using)
+# diffusers>=0.21.0
+# transformers>=4.33.0
+# accelerate>=0.23.0
