@@ -1,0 +1,41 @@
+# Default Training Configuration for Style Transfer
+
+# Data paths
+content_dir: 'data/train/content'  # MS COCO or similar dataset
+style_dir: 'data/train/styles'      # WikiArt or style images
+
+# Model settings
+image_size: 256
+use_temporal: false
+lightweight: false
+
+# Training hyperparameters
+batch_size: 8
+epochs: 40
+learning_rate: 0.0001
+weight_decay: 0.00001
+
+# Loss weights
+content_weight: 1.0
+style_weight: 10.0
+temporal_weight: 5.0  # If using temporal consistency
+
+# Training settings
+num_workers: 4
+save_interval: 5  # Save checkpoint every N epochs
+
+# Output directories
+checkpoint_dir: 'checkpoints'
+log_dir: 'logs/tensorboard'
+
+# Distributed training (automatically set by script)
+world_size: 1
+rank: 0
+
+# Optimization
+mixed_precision: true
+gradient_clip: 5.0
+
+# Evaluation
+eval_interval: 5
+num_eval_samples: 100

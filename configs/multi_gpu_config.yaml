@@ -1,0 +1,50 @@
+# Multi-GPU Training Configuration
+# Optimized for 4x NVIDIA RTX 3090 setup
+
+# Data paths
+content_dir: 'data/train/content'
+style_dir: 'data/train/styles'
+
+# Model settings
+image_size: 512  # Larger images with multiple GPUs
+use_temporal: true
+lightweight: false
+
+# Training hyperparameters
+batch_size: 16  # Per GPU (total: 16 * 4 = 64)
+epochs: 100
+learning_rate: 0.0002
+weight_decay: 0.00001
+
+# Loss weights
+content_weight: 1.0
+style_weight: 10.0
+temporal_weight: 5.0
+
+# Training settings
+num_workers: 8
+save_interval: 10
+
+# Output directories
+checkpoint_dir: 'checkpoints/multi_gpu'
+log_dir: 'logs/multi_gpu'
+
+# Distributed training
+# Set by script based on available GPUs
+world_size: 4
+backend: 'nccl'  # Use NCCL for NVIDIA GPUs
+
+# Optimization
+mixed_precision: true
+gradient_clip: 10.0
+gradient_accumulation_steps: 2  # Effective batch size: 128
+
+# Data augmentation
+random_crop: true
+random_flip: true
+color_jitter: true
+
+# Evaluation
+eval_interval: 5
+num_eval_samples: 500
+save_images: true
