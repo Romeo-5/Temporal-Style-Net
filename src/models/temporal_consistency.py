@@ -74,6 +74,10 @@ def warp_frame(frame, flow):
     """
     N, C, H, W = frame.size()
     
+    # Ensure flow matches frame dimensions
+    if flow.shape[2] != H or flow.shape[3] != W:
+        flow = F.interpolate(flow, size=(H, W), mode='bilinear', align_corners=True)
+    
     # Create sampling grid
     grid_y, grid_x = torch.meshgrid(
         torch.arange(H, device=frame.device),
