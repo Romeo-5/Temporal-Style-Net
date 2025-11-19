@@ -23,9 +23,6 @@ tensorboard>=2.14.0
 tqdm>=4.66.0
 pyyaml>=6.0
 
-# Multi-GPU support
-torch-distributed>=0.1.0
-
 # Demo and visualization
 gradio>=3.50.0
 matplotlib>=3.7.0
