@@ -187,12 +187,9 @@ class StyleTransferNet(nn.Module):
         # Decode
         output = self.decode(t)
     
-        # FIX: Resize decoder output to match content dimensions
+        # FIX: Resize to match input
         if output.shape != content.shape:
             output = F.interpolate(output, size=content.shape[2:], mode='bilinear', align_corners=False)
-    
-        # Blend decoded output with original content
-        output = 0.3 * output + 0.7 * content
     
         return output.clamp(0, 1)
     

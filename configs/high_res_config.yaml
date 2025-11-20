@@ -1,0 +1,18 @@
+content_dir: 'data/train/content/train2017/train2017'
+style_dir: 'data/train/styles'
+
+image_size: 512  # Higher resolution!
+batch_size: 4    # Smaller batch for memory
+epochs: 15
+learning_rate: 0.00005
+weight_decay: 0.00001
+use_amp: true  # Use mixed precision training
+
+# Strong style transfer
+content_weight: 1.0
+style_weight: 50.0  # Strong style!
+
+num_workers: 4
+save_interval: 3
+checkpoint_dir: 'checkpoints_512'
+log_dir: 'logs/tensorboard_512'

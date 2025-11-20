@@ -1,0 +1,325 @@
+# ============================================================
+# TemporalStyleNet .gitignore
+# Excludes large files, datasets, models, and sensitive data
+# ============================================================
+
+# ============================================================
+# DATA FILES (Large datasets and images)
+# ============================================================
+
+# Training data
+data/train/
+data/videos/*.mp4
+data/videos/*.avi
+data/videos/*.mov
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# MS-COCO dataset
+train2017/
+train2017.zip
+val2017/
+val2017.zip
+test2017/
+test2017.zip
+
+# Images (keep small examples, exclude large sets)
+data/train/content/
+data/train/styles/*.jpg
+data/train/styles/*.png
+data/outputs/*.mp4
+data/outputs/*.avi
+data/outputs/*.jpg
+data/outputs/*.png
+
+# Keep only a few example images
+!data/styles/starry_night.jpg
+!data/styles/great_wave.jpg
+!data/styles/picasso.jpg
+
+# ============================================================
+# MODEL CHECKPOINTS (Large model files)
+# ============================================================
+
+# All checkpoints
+checkpoints/
+checkpoints_*/
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+
+# Trained models
+models/*.pth
+models/*.pt
+final_model.pth
+
+# Keep only example/pretrained models if needed
+!models/pretrained/
+!models/example_*.pth
+
+# ============================================================
+# LOGS AND OUTPUTS
+# ============================================================
+
+# TensorBoard logs
+logs/
+tensorboard/
+runs/
+logs/tensorboard*/
+
+# Training logs
+*.log
+training_logs/
+output/
+results/
+
+# Temporary outputs
+temp/
+tmp/
+cache/
+
+# ============================================================
+# PYTHON
+# ============================================================
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ============================================================
+# IDE AND EDITORS
+# ============================================================
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Atom
+.atom/
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================
+# OPERATING SYSTEM
+# ============================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================================
+# CUDA / GPU
+# ============================================================
+
+# CUDA cache
+.nv/
+*.cubin
+*.fatbin
+*.ptx
+
+# ============================================================
+# DOCKER
+# ============================================================
+
+# Docker files (if you add Docker later)
+*.dockerignore
+docker-compose.override.yml
+
+# ============================================================
+# TEMPORARY AND BACKUP FILES
+# ============================================================
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# Backup files
+*_old.*
+*_backup.*
+*.orig
+
+# ============================================================
+# DOCUMENTATION BUILD
+# ============================================================
+
+# Sphinx documentation
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# mkdocs documentation
+/site
+
+# ============================================================
+# SECRETS AND CREDENTIALS
+# ============================================================
+
+# API keys and credentials
+.env
+.env.local
+.env.*.local
+secrets.yaml
+credentials.json
+*.pem
+*.key
+*.cert
+
+# Configuration with sensitive data
+config_local.yaml
+local_settings.py
+
+# ============================================================
+# DATASETS AND LARGE FILES (Additional)
+# ============================================================
+
+# Any zip files (datasets)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# Large numpy arrays
+*.npy
+*.npz
+
+# HDF5 files
+*.h5
+*.hdf5
+
+# ============================================================
+# WANDB / MLFlow (If you add experiment tracking)
+# ============================================================
+
+wandb/
+mlruns/
+.wandb/
+
+# ============================================================
+# MISC
+# ============================================================
+
+# Ignore test files
+test_*.py
+*_test.py
+scratch.py
+debug.py
+playground.py
+
+# Ignore large output files
+*.csv
+*.tsv
+*.parquet
+
+# Keep important files
+!requirements.txt
+!README.md
+!LICENSE
+!.gitignore

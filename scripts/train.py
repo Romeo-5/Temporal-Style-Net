@@ -90,7 +90,7 @@ class StyleLoss(nn.Module):
         N, C, H, W = features.size()
         features = features.view(N, C, H * W)
         gram = torch.bmm(features, features.transpose(1, 2))
-        return gram / (C * H * W)
+        return gram / (H * W)
     
     def forward(self, output, style):
         """Compute style loss"""
@@ -101,7 +101,8 @@ class StyleLoss(nn.Module):
         for out_feat, style_feat in zip(output_features, style_features):
             out_gram = self.gram_matrix(out_feat)
             style_gram = self.gram_matrix(style_feat)
-            loss += self.criterion(out_gram, style_gram)
+            layer_loss = self.criterion(out_gram, style_gram)
+            loss += layer_loss
         
         return loss
 
@@ -134,6 +135,16 @@ class Trainer:
         # Tensorboard
         if self.is_main:
             self.writer = SummaryWriter(config['log_dir'])
+            
+            # DEBUG: Print configuration
+            print("\n" + "="*60)
+            print("CONFIGURATION DEBUG")
+            print("="*60)
+            print(f"Content Weight: {self.content_weight}")
+            print(f"Style Weight: {self.style_weight}")
+            print(f"Image Size: {config['image_size']}")
+            print(f"Batch Size: {config['batch_size']}")
+            print("="*60 + "\n")
     
     def setup_models(self):
         """Initialize models"""
@@ -216,6 +227,9 @@ class Trainer:
             self.dataloader.sampler.set_epoch(epoch)
         
         total_loss = 0.0
+        total_content_loss = 0.0
+        total_style_loss = 0.0
+        
         progress = tqdm(self.dataloader, desc=f"Epoch {epoch}") if self.is_main else self.dataloader
         
         for batch_idx, (content, style) in enumerate(progress):
@@ -231,24 +245,55 @@ class Trainer:
             
             loss = self.content_weight * c_loss + self.style_weight * s_loss
             
+            # DEBUG: Print every 500 batches
+            if self.is_main and batch_idx % 500 == 0:
+                print("\n" + "="*60)
+                print(f"BATCH {batch_idx} DEBUG")
+                print("="*60)
+                print(f"Content Loss (raw): {c_loss.item():.6f}")
+                print(f"Style Loss (raw): {s_loss.item():.6f}")
+                print(f"Content Weight: {self.content_weight}")
+                print(f"Style Weight: {self.style_weight}")
+                print(f"Weighted Content Loss: {(self.content_weight * c_loss).item():.6f}")
+                print(f"Weighted Style Loss: {(self.style_weight * s_loss).item():.6f}")
+                print(f"Total Loss: {loss.item():.6f}")
+                print("="*60 + "\n")
+            
             # Backward pass
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
             
             total_loss += loss.item()
+            total_content_loss += c_loss.item()
+            total_style_loss += s_loss.item()
             
-            # Logging
+            # Logging to TensorBoard
             if self.is_main and batch_idx % 100 == 0:
                 step = epoch * len(self.dataloader) + batch_idx
+                
+                # Log individual losses
                 self.writer.add_scalar('Loss/total', loss.item(), step)
                 self.writer.add_scalar('Loss/content', c_loss.item(), step)
                 self.writer.add_scalar('Loss/style', s_loss.item(), step)
+                
+                # Log weighted losses for comparison
+                self.writer.add_scalar('Loss/weighted_content', (self.content_weight * c_loss).item(), step)
+                self.writer.add_scalar('Loss/weighted_style', (self.style_weight * s_loss).item(), step)
         
         avg_loss = total_loss / len(self.dataloader)
+        avg_content = total_content_loss / len(self.dataloader)
+        avg_style = total_style_loss / len(self.dataloader)
         
         if self.is_main:
-            print(f"Epoch {epoch}: Average Loss = {avg_loss:.4f}")
+            print("\n" + "="*60)
+            print(f"EPOCH {epoch} SUMMARY")
+            print("="*60)
+            print(f"Average Total Loss: {avg_loss:.4f}")
+            print(f"Average Content Loss: {avg_content:.4f}")
+            print(f"Average Style Loss: {avg_style:.4f}")
+            print(f"Average Weighted Style Loss: {avg_style * self.style_weight:.4f}")
+            print("="*60 + "\n")
         
         return avg_loss
     

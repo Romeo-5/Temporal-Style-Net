@@ -14,6 +14,8 @@ from torchvision import transforms
 
 from ..models.style_transfer import StyleTransferNet, LightweightStyleTransferNet
 from ..models.temporal_consistency import TemporalConsistencyModule
+from ..models.neural_style import VGGStyleTransfer, FastVGGStyleTransfer
+from ..models.style_transfer import StyleTransferNet, LightweightStyleTransferNet
 
 
 class VideoStyleTransfer:
@@ -45,7 +47,7 @@ class VideoStyleTransfer:
         if lightweight:
             self.style_net = LightweightStyleTransferNet().to(self.device)
         else:
-            self.style_net = StyleTransferNet().to(self.device)
+            self.style_net = StyleTransferNet().to(self.device)  # Use the trained architecture
         
         if model_path is not None:
             self.load_model(model_path)
