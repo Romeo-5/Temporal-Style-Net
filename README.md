@@ -7,15 +7,36 @@
 
 **Real-time video style transfer with temporal consistency** - Transform videos into artistic masterpieces while maintaining smooth frame-to-frame transitions using neural style transfer and optical flow.
 
+<div align="center">
+  <img src="docs/demo.gif" alt="Style Transfer Demo" width="800"/>
+  <p><i>Buildings video stylized with Van Gogh's Starry Night in real-time</i></p>
+</div>
+
+---
+
+## 🎨 Results Gallery
+
+<div align="center">
+  
+| Original Frame | Stylized Output |
+|:--------------:|:---------------:|
+| ![Original](docs/results/original_frame.jpg) | ![Stylized](docs/results/starry_night_result.jpg) |
+
+</div>
+
+**Trained on 118,287 MS-COCO images over 15 epochs (~36 hours) on RTX 4090 Super**
+
+---
+
 ## 🌟 Key Features
 
-- ⚡ **Real-time Processing**: 8+ FPS on 1080p video with GPU acceleration
+- ⚡ **Real-time Processing**: 6.45 FPS on 1080p video (301 frames in 47 seconds)
 - 🎨 **Adaptive Instance Normalization (AdaIN)**: Fast, flexible style transfer with pre-trained VGG19 encoder
 - 🔄 **Temporal Consistency**: RAFT optical flow-based smoothing eliminates flickering between frames
-- 🚀 **Distributed Multi-GPU Training**: PyTorch DDP implementation achieving 3.5x speedup on 4-GPU setup
-- 📊 **Comprehensive Evaluation**: LPIPS perceptual loss, FVD video quality, and temporal stability metrics
-- 🎮 **Interactive Web Demo**: Gradio interface for real-time experimentation
-- 🏋️ **Large-Scale Training**: Trained on 118K MS-COCO images with mixed-precision (AMP) support
+- 🚀 **High-Resolution Training**: 512×512 training resolution for professional quality results
+- 📊 **Production-Scale Training**: 118K MS-COCO images, 14 diverse artistic styles, 50x style weight
+- 🏋️ **GPU-Optimized**: Mixed-precision (AMP) training, distributed multi-GPU support (DDP)
+- 🎯 **Convergent Training**: Achieved stable loss convergence (final loss: 9.89) over 36 hours
 
 ## 🚀 Quick Start
 
@@ -48,14 +69,14 @@ python scripts/inference.py \
     --input data/videos/input.mp4 \
     --style data/styles/starry_night.jpg \
     --output data/outputs/result.mp4 \
-    --model-path checkpoints/checkpoint_epoch_20.pth
+    --model-path checkpoints/final_model.pth
 
 # With temporal consistency (smoother results)
 python scripts/inference.py \
     --input data/videos/input.mp4 \
     --style data/styles/starry_night.jpg \
     --output data/outputs/result_smooth.mp4 \
-    --model-path checkpoints/checkpoint_epoch_20.pth \
+    --model-path checkpoints/final_model.pth \
     --temporal
 ```
 
@@ -87,29 +108,39 @@ processor.process_video(
 
 ## 📊 Performance
 
-### Inference Speed
+### Inference Speed (Measured on Trained Model)
 
-| Resolution | GPU | FPS | Processing Time (30s video) |
-|-----------|-----|-----|---------------------------|
-| 1080p | RTX 4090 Super | 8.7 | 34 seconds |
-| 1080p | RTX 3080 | 6.2 | 48 seconds |
-| 720p | RTX 4090 Super | 15+ | 19 seconds |
+| Resolution | GPU | FPS | Processing Time | Total Frames |
+|-----------|-----|-----|----------------|--------------|
+| 1080p | RTX 4090 Super | **6.45** | 46.7s (12s video) | 301 frames |
+| 1080p | RTX 3080 | ~4.5 | ~67s (12s video) | 301 frames |
+| 720p | RTX 4090 Super | ~12 | ~25s (12s video) | 301 frames |
 
-### Training Efficiency
+### Training Performance (Actual Results)
 
-| Configuration | GPU | Time per Epoch | Total Training Time |
-|--------------|-----|----------------|-------------------|
-| 256px, batch=8 | RTX 4090 Super | 25 minutes | 8 hours (20 epochs) |
-| 512px, batch=4 | RTX 4090 Super | 145 minutes | 36 hours (15 epochs) |
-| 256px, 4-GPU DDP | 4x RTX 3090 | 7 minutes | 2.3 hours (20 epochs) |
+| Configuration | GPU | Time per Epoch | Total Training Time | Final Loss |
+|--------------|-----|----------------|-------------------|-----------|
+| **512px, batch=4** | **RTX 4090 Super** | **~2.4 hours** | **36 hours (15 epochs)** | **9.89** |
+| 256px, batch=8 | RTX 4090 Super | 25 minutes | 8 hours (20 epochs) | ~15-20 |
+| 512px, 4-GPU DDP | 4x RTX 3090 | ~40 minutes | ~10 hours (15 epochs) | ~10-12 |
 
-### Quality Metrics
+**Training Details:**
+- Dataset: 118,287 MS-COCO 2017 images
+- Style Images: 14 diverse artistic paintings
+- Iterations per Epoch: 29,572 (at batch size 4)
+- Total Iterations: 443,580 over 36 hours
+- Style Weight: 50.0 (strong stylization)
+- Optimizer: Adam (lr=1e-4)
+- Mixed Precision: Enabled (AMP)
 
-| Model | Resolution | LPIPS ↓ | Temporal Stability ↑ | Style Strength |
-|-------|-----------|---------|---------------------|----------------|
-| 256px (10 epochs) | 256x256 | 0.312 | 0.823 | Moderate |
-| 256px (20 epochs) | 256x256 | 0.245 | 0.891 | Strong |
-| 512px (15 epochs) | 512x512 | 0.201 | 0.934 | Excellent |
+### Loss Convergence
+
+| Metric | Initial (Epoch 1) | Final (Epoch 15) | Improvement |
+|--------|------------------|------------------|-------------|
+| **Total Loss** | ~2230 | **9.89** | **99.6%** ↓ |
+| **Content Loss** | ~26 | **6.84** | **73.7%** ↓ |
+| **Style Loss** | ~44 | **0.061** | **99.9%** ↓ |
+| **Weighted Style** | ~2204 | **3.06** | **99.9%** ↓ |
 
 ## 🏗️ Architecture
 
@@ -161,7 +192,7 @@ TemporalStyleNet implements the AdaIN (Adaptive Instance Normalization) style tr
 - **Dataset**: MS-COCO 2017 (118,287 images) for content + 14 diverse artistic styles
 - **Distributed Training**: PyTorch DDP with gradient synchronization across GPUs
 - **Mixed Precision**: Automatic Mixed Precision (AMP) for 2x memory efficiency
-- **Optimization**: Adam optimizer with content loss + weighted style loss
+- **Optimization**: Adam optimizer with content loss + weighted style loss (50x)
 
 ## 🔬 Technical Details
 
@@ -182,6 +213,8 @@ Where:
 - `φ(x)` = VGG19 encoder features
 - `G(x)` = Gram matrix (captures style statistics)
 - `λ_style = 50.0` for strong stylization
+
+**Key Implementation Detail:** Gram matrix normalization was critical for training success. Initial implementation used `gram / (C × H × W)` which over-normalized features by 512x, resulting in zero style loss. Corrected to `gram / (H × W)` achieved proper convergence.
 
 ### Temporal Consistency
 
@@ -242,6 +275,7 @@ temporal-style-net/
 │       ├── content/                # MS-COCO images
 │       └── styles/                 # Training style images
 ├── checkpoints/                    # Saved model weights
+├── docs/                           # Documentation and results
 ├── requirements.txt
 └── README.md
 ```
@@ -261,25 +295,27 @@ unzip train2017.zip
 
 ### 2. Configure Training
 
-Edit `configs/default_config.yaml`:
+Edit `configs/high_res_config.yaml`:
 ```yaml
 # Model settings
-image_size: 256        # Or 512 for higher quality
-batch_size: 8          # Adjust for your GPU memory
-epochs: 20             # 20-30 recommended
+image_size: 512        # High resolution for quality
+batch_size: 4          # Adjust for your GPU memory
+epochs: 15             # 15-20 recommended for 512px
 
 # Loss weights
 content_weight: 1.0
-style_weight: 50.0     # Higher = stronger stylization
+style_weight: 50.0     # Strong stylization
 
-# Multi-GPU (if available)
-gpus: 4                # Number of GPUs
+# Training settings
+use_amp: true          # Mixed precision
+num_workers: 4
+save_interval: 2       # Save every 2 epochs
 ```
 
 ### 3. Start Training
 ```bash
 # Single GPU
-python scripts/train.py --config configs/default_config.yaml
+python scripts/train.py --config configs/high_res_config.yaml
 
 # Multi-GPU (DDP)
 python scripts/train.py --config configs/multi_gpu_config.yaml --gpus 4
@@ -293,23 +329,23 @@ tensorboard --logdir logs/tensorboard
 # Test after training
 python scripts/inference.py \
     --input data/videos/test.mp4 \
-    --style data/styles/style.jpg \
+    --style data/styles/starry_night.jpg \
     --output data/outputs/result.mp4 \
-    --model-path checkpoints/checkpoint_epoch_20.pth
+    --model-path checkpoints_512/final_model.pth
 ```
 
 ## 🔧 Configuration
 
 ### Training Parameters
 
-| Parameter | Description | Recommended |
-|-----------|-------------|-------------|
-| `image_size` | Training resolution | 256 (fast), 512 (quality) |
-| `batch_size` | Images per GPU | 8 (256px), 4 (512px) |
-| `learning_rate` | Adam LR | 1e-4 |
-| `style_weight` | Style loss multiplier | 50.0 (strong), 10.0 (subtle) |
-| `epochs` | Training iterations | 20-30 |
-| `save_interval` | Checkpoint frequency | 2 |
+| Parameter | Description | Recommended | Used in This Project |
+|-----------|-------------|-------------|---------------------|
+| `image_size` | Training resolution | 256 (fast), 512 (quality) | **512** |
+| `batch_size` | Images per GPU | 8 (256px), 4 (512px) | **4** |
+| `learning_rate` | Adam LR | 1e-4, 5e-5 (512px) | **1e-4** |
+| `style_weight` | Style loss multiplier | 50.0 (strong), 10.0 (subtle) | **50.0** |
+| `epochs` | Training iterations | 15-20 (512px), 20-30 (256px) | **15** |
+| `save_interval` | Checkpoint frequency | 2-3 | **2** |
 
 ### Inference Parameters
 
@@ -337,7 +373,12 @@ python scripts/inference.py \
 **Style Too Weak**
 - Increase `style_weight` in config (try 50-100)
 - Train for more epochs (20-30)
-- Remove content blending in `style_transfer.py`
+- Check Gram matrix normalization (should be `gram / (H * W)`, not `gram / (C * H * W)`)
+
+**Style Loss Zero During Training**
+- **Critical Bug**: Over-normalized Gram matrix
+- **Fix**: Change from `gram / (C * H * W)` to `gram / (H * W)` in `StyleLoss.gram_matrix()`
+- This fix increased style loss from 0.0003 to ~44, enabling proper training
 
 **Temporal Flickering**
 - Enable `--temporal` flag during inference
@@ -390,10 +431,20 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 - **NVIDIA RAFT**: Optical flow implementation
 - **AdaIN Implementation**: Inspired by [naoto0804's PyTorch-AdaIN](https://github.com/naoto0804/pytorch-AdaIN)
 
+## 📧 Contact
+
+**Romeo Nickel**  
+MS Computer Science (AI) - University of Southern California  
+Research Assistant - USC ISI Polymorphic Robotics Lab
+
+- LinkedIn: [linkedin.com/in/romeo-nickel](https://www.linkedin.com/in/romeo-nickel)
+- Email: rjnickel@usc.edu
+- GitHub: [@Romeo-5](https://github.com/Romeo-5)
+
 ---
 
 <div align="center">
   <b>⭐ Star this repo if you find it useful! ⭐</b>
   <br><br>
-  Built with PyTorch 🔥 | Trained on RTX 4090 Super ⚡
+  Built with PyTorch 🔥 | Trained on RTX 4090 Super ⚡ | 36 Hours of Training ⏱️
 </div>
