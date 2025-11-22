@@ -323,3 +323,6 @@ playground.py
 !README.md
 !LICENSE
 !.gitignore
+
+!docs/results/original_frame.jpg
+!docs/results/starry_night_result.jpg
