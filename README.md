@@ -20,7 +20,7 @@
   
 | Original Frame | Stylized Output |
 |:--------------:|:---------------:|
-| ![Original](docs/results/original_frame.jpg) | ![Stylized](docs/results/starry_night_result.jpg) |
+| ![Original](docs/original_frame.jpg) | ![Stylized](docs/starry_night_result.jpg) |
 
 </div>
 
